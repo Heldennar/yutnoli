@@ -9,6 +9,7 @@
 #include "afxdialogex.h"
 #include <atlimage.h>
 #include <afxsock.h>
+#include "YutnoriClass.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -20,7 +21,6 @@
 class CAboutDlg : public CDialogEx
 {
 public:
-	CAboutDlg();
 
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
@@ -51,9 +51,9 @@ END_MESSAGE_MAP()
 
 CyutnoliDlg::CyutnoliDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_YUTNOLI_DIALOG, pParent)
-	, m_strIP(_T(""))
+	, m_strIP(_T("127.0.0.1"))
 	, m_strSend(_T(""))
-	, m_strUserID(_T(""))
+	, m_strUserID(_T("대기 중"))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -121,6 +121,7 @@ BEGIN_MESSAGE_MAP(CyutnoliDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CyutnoliDlg::OnClickedButtonConnect)
 	ON_BN_CLICKED(IDCANCEL, &CyutnoliDlg::OnBnClickedCancel)
 	ON_BN_CLICKED(IDC_BUTTON_SEND, &CyutnoliDlg::OnClickedButtonSend)
+	ON_BN_CLICKED(IDC_THROW, &CyutnoliDlg::OnBnClickedThrow)
 END_MESSAGE_MAP()
 
 
@@ -321,7 +322,48 @@ void CyutnoliDlg::OnClickedButtonSend()
 	// 전송한 데이터도 리스트박스에 보여준다.
 	strTmp.Format(_T("%s"), pTmp);
 	int i = m_list.GetCount();
-	m_list.InsertString(i, strTmp);
+	m_list.AddString(strTmp);
 
 	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnBnClickedThrow()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	YutnoriClass yut;
+	int i = 0;
+	CString str;
+	
+	int roll = yut.roll(i);
+	switch (roll)
+	{
+	case -1:
+	{
+		m_list.AddString(_T("백도가 나왔습니다.")); 
+		break;
+	}
+	case 1: {
+		m_list.AddString(_T("도가 나왔습니다.")); 
+		break;
+	}
+	case 2: {
+		m_list.AddString(_T("개가 나왔습니다.")); 
+		break;
+	}
+	case 3: {
+		m_list.AddString(_T("걸이 나왔습니다")); 
+		break;
+	}
+	case 4: {
+		m_list.AddString(_T("윷이 나왔습니다")); 
+		break;
+	}
+	case 5: {
+		m_list.AddString(_T("모가 나왔습니다")); 
+		break;
+	}
+		
+	}
+	i++;
 }

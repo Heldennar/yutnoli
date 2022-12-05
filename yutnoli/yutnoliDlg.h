@@ -87,4 +87,5 @@ public:
 	CListBox m_list;
 	CString m_strUserID;
 	CString m_strIP;
+	afx_msg void OnBnClickedThrow();
 };

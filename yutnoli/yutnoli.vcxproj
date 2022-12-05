@@ -190,6 +190,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="yutnoli.h" />
     <ClInclude Include="yutnoliDlg.h" />
+    <ClInclude Include="YutnoriClass.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CSocCom.cpp" />
@@ -201,6 +202,7 @@
     </ClCompile>
     <ClCompile Include="yutnoli.cpp" />
     <ClCompile Include="yutnoliDlg.cpp" />
+    <ClCompile Include="YutnoriClass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="yutnoli.rc" />
