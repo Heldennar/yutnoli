@@ -122,6 +122,7 @@ BEGIN_MESSAGE_MAP(CyutnoliDlg, CDialogEx)
 	ON_BN_CLICKED(IDCANCEL, &CyutnoliDlg::OnBnClickedCancel)
 	ON_BN_CLICKED(IDC_BUTTON_SEND, &CyutnoliDlg::OnClickedButtonSend)
 	ON_BN_CLICKED(IDC_THROW, &CyutnoliDlg::OnBnClickedThrow)
+	ON_STN_CLICKED(player11, &CyutnoliDlg::OnClickedPlayer11)
 END_MESSAGE_MAP()
 
 
@@ -255,7 +256,7 @@ HCURSOR CyutnoliDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-LPARAM CyutnoliDlg::OnReceive(UINT wParam, LPARAM lParam) {
+LPARAM CyutnoliDlg::OnReceive(WPARAM wPara, LPARAM lPara) {
 
 	// 접속된 곳에서 데이터가 도착했을 때
 	UpdateData(TRUE);
@@ -331,39 +332,57 @@ void CyutnoliDlg::OnClickedButtonSend()
 void CyutnoliDlg::OnBnClickedThrow()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	YutnoriClass yut;
-	int i = 0;
+	
+	UpdateData(TRUE);
 	CString str;
 	
-	int roll = yut.roll(i);
-	switch (roll)
+	int rollv = roll(roll_m);
+	switch (rollv)
 	{
 	case -1:
 	{
 		m_list.AddString(_T("백도가 나왔습니다.")); 
+		str = "백도가 나왔습니다.";
 		break;
 	}
 	case 1: {
 		m_list.AddString(_T("도가 나왔습니다.")); 
+		str = "백도가 나왔습니다.";
 		break;
 	}
 	case 2: {
 		m_list.AddString(_T("개가 나왔습니다.")); 
+		str = "백도가 나왔습니다.";
 		break;
 	}
 	case 3: {
-		m_list.AddString(_T("걸이 나왔습니다")); 
+		m_list.AddString(_T("걸이 나왔습니다"));
+		str = "백도가 나왔습니다.";
 		break;
 	}
 	case 4: {
-		m_list.AddString(_T("윷이 나왔습니다")); 
+		m_list.AddString(_T("윷이 나왔습니다"));
+		str = "백도가 나왔습니다.";
 		break;
 	}
 	case 5: {
-		m_list.AddString(_T("모가 나왔습니다")); 
+		m_list.AddString(_T("모가 나왔습니다"));
+		str = "백도가 나왔습니다.";
 		break;
 	}
 		
 	}
-	i++;
+	m_socCom.Send(str, 256);
+	roll_m++;
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPlayer11()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	m_list.AddString(_T("백도가 나왔습니다."));
+	UpdateData(FALSE);
+
 }

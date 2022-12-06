@@ -2,11 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "yutnoliDlg.h"
 
-class YutnoriClass :public CyutnoliDlg
+
+class YutnoriClass
 {
 private:
+	
+protected:
+	int roll_m;
 	int player1[4]; //플레이어 말
 	int player2[4];
 	int board[25]; //보드 (21~25 == 골인)
