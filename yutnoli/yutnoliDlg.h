@@ -32,10 +32,10 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
-	afx_msg LPARAM OnReceive(WPARAM wPara, LPARAM lPara);
+	afx_msg LRESULT OnReceive(WPARAM wPara, LPARAM lPara);
 	DECLARE_MESSAGE_MAP()
 public:
-
+	void SendFrameData(SOCKET ah_socket, unsigned char a_msg_id, const char* ap_data, unsigned short int a_data_size);
 	CStatic g1;
 	CStatic g2;
 	CStatic g3;
@@ -89,4 +89,5 @@ public:
 	CString m_strIP;
 	afx_msg void OnBnClickedThrow();
 	afx_msg void OnClickedPlayer11();
+	afx_msg void OnClickedReady();
 };

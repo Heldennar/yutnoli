@@ -13,13 +13,13 @@ YutnoriClass::YutnoriClass()
 	for (int i = 0; i < 4; i++) { player2[i] = 0; }
 	for (int i = 0; i < b_len; i++) { board[i] = 0; } //보드 리셋
 	for (int i = 0; i < 4; i++) { dice[i] = 0; }
-	playing = true;
+	playing = NULL;
 	turn = NULL;
 	roll_m = 0;
 }
 int YutnoriClass::roll(int i)
 {
-	int roll = 0;
+	int rollv = 0;
 	bool temp = true;
 
 	moveNum = new int[i + 1];
@@ -43,10 +43,10 @@ int YutnoriClass::roll(int i)
 		// 0 부터 99 까지 균등하게 나타나는 난수열을 생성하기 위해 균등 분포 정의.
 		std::uniform_int_distribution<int> dis(0, 1);
 		dice[j] = dis(gen);
-		roll += dice[j];
+		rollv += dice[j];
 	}
-	moveNum[i] = roll;
-	return moveNum[i];
+	moveNum[i] = rollv;
+	return rollv;
 }
 void YutnoriClass::move(int player)
 {

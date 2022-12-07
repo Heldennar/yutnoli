@@ -117,12 +117,13 @@ BEGIN_MESSAGE_MAP(CyutnoliDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_MESSAGE(UM_RECEIVE, (LRESULT(AFX_MSG_CALL CWnd::*)(WPARAM, LPARAM)) OnReceive)
+	ON_MESSAGE(UM_RECEIVE, OnReceive)
 	ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CyutnoliDlg::OnClickedButtonConnect)
 	ON_BN_CLICKED(IDCANCEL, &CyutnoliDlg::OnBnClickedCancel)
 	ON_BN_CLICKED(IDC_BUTTON_SEND, &CyutnoliDlg::OnClickedButtonSend)
 	ON_BN_CLICKED(IDC_THROW, &CyutnoliDlg::OnBnClickedThrow)
 	ON_STN_CLICKED(player11, &CyutnoliDlg::OnClickedPlayer11)
+	ON_BN_CLICKED(IDC_READY, &CyutnoliDlg::OnClickedReady)
 END_MESSAGE_MAP()
 
 
@@ -220,6 +221,22 @@ void CyutnoliDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
+void CyutnoliDlg::SendFrameData(SOCKET ah_socket, unsigned char a_msg_id, const char* ap_data, unsigned short int a_data_size)
+//어떤 소켓으로,어떤 메세지인지, 어떤데이터를, 얼마만큼 보낼지가 매개변수로 전달된다.
+{
+	int send_data_size = a_data_size + 4;
+	char* p_send_data = new char[send_data_size];//여기까지가 전송할 크기를 만들어냄
+
+	*p_send_data = 27; //유효한 메세지인지 확인시킴 //첫번째 헤더
+	*(p_send_data + 1) = a_msg_id; // 두번째 1바이트에 msg_id
+	*(unsigned short int*)(p_send_data + 2) = a_data_size; // 포인터의 변위를 2바이트로 캐스팅한다.
+	memcpy(p_send_data + 4, ap_data, a_data_size);
+	//ap_data를 a_data_size의 크기만큼 복사해서 p_send_data[4]에 복사하겠다.
+	send(ah_socket, p_send_data, send_data_size, 0);
+
+	delete[] p_send_data;
+}
+
 // 대화 상자에 최소화 단추를 추가할 경우 아이콘을 그리려면
 //  아래 코드가 필요합니다.  문서/뷰 모델을 사용하는 MFC 애플리케이션의 경우에는
 //  프레임워크에서 이 작업을 자동으로 수행합니다.
@@ -276,7 +293,7 @@ LPARAM CyutnoliDlg::OnReceive(WPARAM wPara, LPARAM lPara) {
 	else {
 		// 리스트박스에 보여준다.
 		int i = m_list.GetCount();
-		m_list.InsertString(i, strTmp);
+		m_list.AddString(strTmp);
 	}
 	UpdateData(FALSE);
 	return TRUE;
@@ -335,44 +352,47 @@ void CyutnoliDlg::OnBnClickedThrow()
 	
 	UpdateData(TRUE);
 	CString str;
-	
-	int rollv = roll(roll_m);
-	switch (rollv)
-	{
-	case -1:
-	{
-		m_list.AddString(_T("백도가 나왔습니다.")); 
-		str = "백도가 나왔습니다.";
-		break;
+	if (turn) {
+		int rollv = roll(roll_m);
+		switch (rollv)
+		{
+		case -1:
+		{
+			m_list.AddString(_T("백도가 나왔습니다."));
+			str = "백도가 나왔습니다.";
+			break;
+		}
+		case 1: {
+			m_list.AddString(_T("도가 나왔습니다."));
+			str = "도가 나왔습니다.";
+			break;
+		}
+		case 2: {
+			m_list.AddString(_T("개가 나왔습니다."));
+			str = "개가 나왔습니다.";
+			break;
+		}
+		case 3: {
+			m_list.AddString(_T("걸이 나왔습니다"));
+			str = "걸이 나왔습니다.";
+			break;
+		}
+		case 4: {
+			m_list.AddString(_T("윷이 나왔습니다"));
+			str = "윷이 나왔습니다.";
+			break;
+		}
+		case 0: {
+			m_list.AddString(_T("모가 나왔습니다"));
+			str = "모가 나왔습니다.";
+			break;
+		}
+
+		}
 	}
-	case 1: {
-		m_list.AddString(_T("도가 나왔습니다.")); 
-		str = "백도가 나왔습니다.";
-		break;
-	}
-	case 2: {
-		m_list.AddString(_T("개가 나왔습니다.")); 
-		str = "백도가 나왔습니다.";
-		break;
-	}
-	case 3: {
-		m_list.AddString(_T("걸이 나왔습니다"));
-		str = "백도가 나왔습니다.";
-		break;
-	}
-	case 4: {
-		m_list.AddString(_T("윷이 나왔습니다"));
-		str = "백도가 나왔습니다.";
-		break;
-	}
-	case 5: {
-		m_list.AddString(_T("모가 나왔습니다"));
-		str = "백도가 나왔습니다.";
-		break;
-	}
-		
-	}
-	m_socCom.Send(str, 256);
+	else
+		MessageBox(L"당신의 차례가 아닙니다.");
+	m_socCom.Send(str, str.GetLength() + 1);
 	roll_m++;
 	UpdateData(FALSE);
 }
@@ -386,3 +406,11 @@ void CyutnoliDlg::OnClickedPlayer11()
 	UpdateData(FALSE);
 
 }
+
+
+void CyutnoliDlg::OnClickedReady()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	
+}
+
