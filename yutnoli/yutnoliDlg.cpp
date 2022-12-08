@@ -237,6 +237,7 @@ void CyutnoliDlg::SendFrameData(SOCKET ah_socket, unsigned char a_msg_id, const 
 	delete[] p_send_data;
 }
 
+
 // 대화 상자에 최소화 단추를 추가할 경우 아이콘을 그리려면
 //  아래 코드가 필요합니다.  문서/뷰 모델을 사용하는 MFC 애플리케이션의 경우에는
 //  프레임워크에서 이 작업을 자동으로 수행합니다.
@@ -273,7 +274,7 @@ HCURSOR CyutnoliDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-LPARAM CyutnoliDlg::OnReceive(WPARAM wPara, LPARAM lPara) {
+LPARAM CyutnoliDlg::OnReceive(WPARAM wParam, LPARAM lParam) {
 
 	// 접속된 곳에서 데이터가 도착했을 때
 	UpdateData(TRUE);
@@ -311,6 +312,45 @@ void CyutnoliDlg::OnClickedButtonConnect()
 	m_socCom.Init(this->m_hWnd);
 }
 
+CString CyutnoliDlg:: CH2CS(char* strInput)
+
+{
+
+	// ## char* -> wchar_t -> CString ##
+
+	wchar_t* strWCHAR;
+	CString strOutput;
+	int iLength;
+
+	iLength = MultiByteToWideChar(CP_ACP, 0, strInput, strlen(strInput), NULL, NULL);
+	strWCHAR = SysAllocStringLen(NULL, iLength);
+	MultiByteToWideChar(CP_ACP, 0, strInput, strlen(strInput), strWCHAR, iLength);
+
+	strOutput.Format(_T("%s"), strWCHAR);
+
+	return strOutput;
+}
+
+char* CyutnoliDlg::CS2CHAR(CString strInput)
+
+{
+
+	// ## CString -> wchar_t -> char* ##
+	wchar_t* strWCHAR;
+	char* strOutput;
+	int iLength;
+
+	strWCHAR = strInput.GetBuffer(strInput.GetLength());
+
+	iLength = WideCharToMultiByte(CP_ACP, 0, strWCHAR, -1, NULL, 0, NULL, NULL);
+
+	strOutput = new char[iLength];
+
+	WideCharToMultiByte(CP_ACP, 0, strWCHAR, -1, strOutput, iLength, 0, 0);
+	
+	return strOutput;
+
+}
 
 void CyutnoliDlg::OnBnClickedCancel()
 {
@@ -320,22 +360,46 @@ void CyutnoliDlg::OnBnClickedCancel()
 	CDialogEx::OnCancel();
 }
 
+void CyutnoliDlg::SendChat(CString str, int check)
+{
+	/*
+	int bSize = strlen + 4;
+	char* bTmp = new char [bSize];
+	unsigned char* chTmp = new char[strlen];
+	memcpy(st, (unsigned char*)(LPCTSTR)str, i);
+	*/
+	unsigned short int strlen = str.GetLength();
+	m_list.AddString(str);
+	int len_s = (sizeof(char) * strlen * 2) + 1;
+	char * pTmp = new char[strlen];
+	pTmp = CS2CHAR(str);
+	char* buff = new char[len_s + 2];
+	*buff = check;//20 = 채팅, NXY(N플레이어가X말을 Y만큼 움직임)
+	*(buff + 1) = len_s;
+	memcpy(buff + 2, pTmp, len_s);
+	m_socCom.Send(buff,len_s+2);
+
+	
+	delete[] buff;
+	delete[] pTmp;
+}
 
 void CyutnoliDlg::OnClickedButtonSend()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	UpdateData(TRUE);
-	char pTmp[256];
+	TCHAR pTmp[256];
 	CString strTmp;
 
 	// pTmp에 전송할 데이터 입력
 	memset(pTmp, '\0', 256);
-	strcpy_s(pTmp, (char*)(LPCTSTR)m_strSend);
+	strTmp = m_strSend;
+	_tcsncpy_s(pTmp, strTmp, _countof(pTmp));
 	m_strSend = "";
 
 	// 전송
-	m_socCom.Send(pTmp, 256);
+	SendChat(strTmp, 20);
 
 	// 전송한 데이터도 리스트박스에 보여준다.
 	strTmp.Format(_T("%s"), pTmp);
@@ -352,39 +416,39 @@ void CyutnoliDlg::OnBnClickedThrow()
 	
 	UpdateData(TRUE);
 	CString str;
-	if (turn) {
+	if (1) {
 		int rollv = roll(roll_m);
 		switch (rollv)
 		{
 		case -1:
 		{
-			m_list.AddString(_T("백도가 나왔습니다."));
 			str = "백도가 나왔습니다.";
+			SendChat(str, 6);
 			break;
 		}
 		case 1: {
-			m_list.AddString(_T("도가 나왔습니다."));
 			str = "도가 나왔습니다.";
+			SendChat(str, 1);
 			break;
 		}
 		case 2: {
-			m_list.AddString(_T("개가 나왔습니다."));
 			str = "개가 나왔습니다.";
+			SendChat(str, 2);
 			break;
 		}
 		case 3: {
-			m_list.AddString(_T("걸이 나왔습니다"));
 			str = "걸이 나왔습니다.";
+			SendChat(str, 3);
 			break;
 		}
 		case 4: {
-			m_list.AddString(_T("윷이 나왔습니다"));
 			str = "윷이 나왔습니다.";
+			SendChat(str, 4);
 			break;
 		}
 		case 0: {
-			m_list.AddString(_T("모가 나왔습니다"));
 			str = "모가 나왔습니다.";
+			SendChat(str, 5);
 			break;
 		}
 
@@ -392,7 +456,7 @@ void CyutnoliDlg::OnBnClickedThrow()
 	}
 	else
 		MessageBox(L"당신의 차례가 아닙니다.");
-	m_socCom.Send(str, str.GetLength() + 1);
+	
 	roll_m++;
 	UpdateData(FALSE);
 }
@@ -411,6 +475,20 @@ void CyutnoliDlg::OnClickedPlayer11()
 void CyutnoliDlg::OnClickedReady()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString str;
+	if (!ready && !playing) {
+		str = _T("<<<준비 완료>>>");
+		SendChat(str, 91);
+	}
+	else if (ready && !playing)
+	{
+		str = _T("<<<준비 해제>>>");
+		SendChat(str, 90);
+	}
+	else if (playing)
+	{
+		MessageBox(L"이미 게임 중입니다.");
+	}
 	
 }
 

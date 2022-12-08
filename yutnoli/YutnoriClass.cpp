@@ -15,6 +15,7 @@ YutnoriClass::YutnoriClass()
 	for (int i = 0; i < 4; i++) { dice[i] = 0; }
 	playing = NULL;
 	turn = NULL;
+	ready = NULL;
 	roll_m = 0;
 }
 int YutnoriClass::roll(int i)

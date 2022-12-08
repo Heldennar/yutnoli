@@ -32,9 +32,12 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
-	afx_msg LRESULT OnReceive(WPARAM wPara, LPARAM lPara);
+	afx_msg LRESULT OnReceive(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 public:
+	CString CH2CS(char* strInput);
+	char* CS2CHAR(CString strInput);
+	void SendChat(CString str, int check);
 	void SendFrameData(SOCKET ah_socket, unsigned char a_msg_id, const char* ap_data, unsigned short int a_data_size);
 	CStatic g1;
 	CStatic g2;

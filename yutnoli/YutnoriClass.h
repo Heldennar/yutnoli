@@ -18,6 +18,7 @@ protected:
 	int b_len; //보드배열 길이
 	bool playing;
 	bool turn;
+	bool ready;
 public:
 	YutnoriClass(); //초기화용
 	int roll(int i); //윷 던지기
