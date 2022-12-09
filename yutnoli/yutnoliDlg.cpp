@@ -91,6 +91,7 @@ void CyutnoliDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, position27, g27);
 	DDX_Control(pDX, position28, g28);
 	DDX_Control(pDX, position29, g29);
+	DDX_Control(pDX, position30, g30);
 
 
 	DDX_Control(pDX, player11, p11);
@@ -111,6 +112,9 @@ void CyutnoliDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_STATIC_USERID, m_strUserID);
 	DDX_Control(pDX, IDC_LIST1, m_list);
 	DDX_Text(pDX, IDC_EDIT_IP, m_strIP);
+	DDX_Control(pDX, IDC_STATIC_USERID, m_useID);
+	DDX_Control(pDX, IDC_MOVE_LIST, m_move_list);
+	DDX_Control(pDX, position30, g30);
 }
 
 BEGIN_MESSAGE_MAP(CyutnoliDlg, CDialogEx)
@@ -124,6 +128,43 @@ BEGIN_MESSAGE_MAP(CyutnoliDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_THROW, &CyutnoliDlg::OnBnClickedThrow)
 	ON_STN_CLICKED(player11, &CyutnoliDlg::OnClickedPlayer11)
 	ON_BN_CLICKED(IDC_READY, &CyutnoliDlg::OnClickedReady)
+	ON_BN_CLICKED(IDC_P1B, &CyutnoliDlg::OnClickedP1b)
+	ON_BN_CLICKED(IDC_P2B, &CyutnoliDlg::OnClickedP2b)
+	ON_BN_CLICKED(IDC_P3B, &CyutnoliDlg::OnClickedP3b)
+	ON_BN_CLICKED(IDC_P4B, &CyutnoliDlg::OnClickedP4b)
+	ON_STN_CLICKED(player12, &CyutnoliDlg::OnClickedPlayer12)
+	ON_STN_CLICKED(player13, &CyutnoliDlg::OnClickedPlayer13)
+	ON_STN_CLICKED(player14, &CyutnoliDlg::OnClickedPlayer14)
+	ON_STN_CLICKED(position1, &CyutnoliDlg::OnClickedPosition1)
+	ON_STN_CLICKED(position10, &CyutnoliDlg::OnClickedPosition10)
+	ON_STN_CLICKED(position11, &CyutnoliDlg::OnClickedPosition11)
+	ON_STN_CLICKED(position12, &CyutnoliDlg::OnClickedPosition12)
+	ON_STN_CLICKED(position13, &CyutnoliDlg::OnClickedPosition13)
+	ON_STN_CLICKED(position14, &CyutnoliDlg::OnClickedPosition14)
+	ON_STN_CLICKED(position15, &CyutnoliDlg::OnClickedPosition15)
+	ON_STN_CLICKED(position16, &CyutnoliDlg::OnClickedPosition16)
+	ON_STN_CLICKED(position17, &CyutnoliDlg::OnClickedPosition17)
+	ON_STN_CLICKED(position18, &CyutnoliDlg::OnClickedPosition18)
+	ON_STN_CLICKED(position19, &CyutnoliDlg::OnClickedPosition19)
+	ON_STN_CLICKED(position2, &CyutnoliDlg::OnClickedPosition2)
+	ON_STN_CLICKED(position20, &CyutnoliDlg::OnClickedPosition20)
+	ON_STN_CLICKED(position21, &CyutnoliDlg::OnClickedPosition21)
+	ON_STN_CLICKED(position22, &CyutnoliDlg::OnClickedPosition22)
+	ON_STN_CLICKED(position23, &CyutnoliDlg::OnClickedPosition23)
+	ON_STN_CLICKED(position24, &CyutnoliDlg::OnClickedPosition24)
+	ON_STN_CLICKED(position25, &CyutnoliDlg::OnClickedPosition25)
+	ON_STN_CLICKED(position26, &CyutnoliDlg::OnClickedPosition26)
+	ON_STN_CLICKED(position27, &CyutnoliDlg::OnClickedPosition27)
+	ON_STN_CLICKED(position28, &CyutnoliDlg::OnClickedPosition28)
+	ON_STN_CLICKED(position29, &CyutnoliDlg::OnClickedPosition29)
+	ON_STN_CLICKED(position3, &CyutnoliDlg::OnClickedPosition3)
+	ON_STN_CLICKED(position30, &CyutnoliDlg::OnClickedPosition30)
+	ON_STN_CLICKED(position4, &CyutnoliDlg::OnClickedPosition4)
+	ON_STN_CLICKED(position5, &CyutnoliDlg::OnClickedPosition5)
+	ON_STN_CLICKED(position6, &CyutnoliDlg::OnClickedPosition6)
+	ON_STN_CLICKED(position7, &CyutnoliDlg::OnClickedPosition7)
+	ON_STN_CLICKED(position8, &CyutnoliDlg::OnClickedPosition8)
+	ON_STN_CLICKED(position9, &CyutnoliDlg::OnClickedPosition9)
 END_MESSAGE_MAP()
 
 
@@ -203,7 +244,7 @@ BOOL CyutnoliDlg::OnInitDialog()
 	st2.SetBitmap(h_bmp);
 	st3.SetBitmap(h_bmp);
 	st4.SetBitmap(h_bmp);
-
+	c_image.Detach();
 
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
@@ -221,21 +262,6 @@ void CyutnoliDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-void CyutnoliDlg::SendFrameData(SOCKET ah_socket, unsigned char a_msg_id, const char* ap_data, unsigned short int a_data_size)
-//어떤 소켓으로,어떤 메세지인지, 어떤데이터를, 얼마만큼 보낼지가 매개변수로 전달된다.
-{
-	int send_data_size = a_data_size + 4;
-	char* p_send_data = new char[send_data_size];//여기까지가 전송할 크기를 만들어냄
-
-	*p_send_data = 27; //유효한 메세지인지 확인시킴 //첫번째 헤더
-	*(p_send_data + 1) = a_msg_id; // 두번째 1바이트에 msg_id
-	*(unsigned short int*)(p_send_data + 2) = a_data_size; // 포인터의 변위를 2바이트로 캐스팅한다.
-	memcpy(p_send_data + 4, ap_data, a_data_size);
-	//ap_data를 a_data_size의 크기만큼 복사해서 p_send_data[4]에 복사하겠다.
-	send(ah_socket, p_send_data, send_data_size, 0);
-
-	delete[] p_send_data;
-}
 
 
 // 대화 상자에 최소화 단추를 추가할 경우 아이콘을 그리려면
@@ -278,24 +304,134 @@ LPARAM CyutnoliDlg::OnReceive(WPARAM wParam, LPARAM lParam) {
 
 	// 접속된 곳에서 데이터가 도착했을 때
 	UpdateData(TRUE);
-	char pTmp[256];
 	CString strTmp;
-	memset(pTmp, '\0', 256);
 
-	// 데이터를 pTmp에 받는다.
-	m_socCom.Receive(pTmp, 256);
-	strTmp.Format(_T("%s"), pTmp);
+	unsigned char check, msg_id;//message_id
+	unsigned short int body_size;
+
+	m_socCom.Receive((char*)&check, 1, 0);    // wParam = 클라이언트 번호/헤더 1바이트 읽기
+	m_socCom.Receive((int*)&body_size, 1, 0);
+	char* pTmp = new char[body_size];
+	memset(pTmp, '\0', body_size);
+	m_socCom.Receive(pTmp, body_size, 0);
+	strTmp = CH2CS(pTmp);
+	CString chstrg = _T("상대 사용자 : ");
 
 	// 서버로 부터 연결완료 메세지를 받으면
 	if (strTmp.Find(_T(SOC_CLIENT_CONNECT)) == 0) {
 		// Right 함수를 이용해 가장 오른쪽에 있는 번호 추출. 0은 \0이다.
 		m_strUserID = _T("사용자 : ") + strTmp.Right(1);
+		m_useID.SetWindowTextW(_T("접속중"));
 	}
 	else {
-		// 리스트박스에 보여준다.
-		int i = m_list.GetCount();
-		m_list.AddString(strTmp);
+		switch (check)
+		{
+		case(20)://채팅
+		{
+			m_list.AddString(chstrg + strTmp);
+			break;
+		}
+		case(91)://준비 87시작 88선턴 89후턴
+		{
+			m_list.AddString(chstrg + strTmp);
+			break;
+		}
+		case(87): {
+			playing = TRUE;
+			m_list.AddString(strTmp);
+			break;
+		}
+		case(88): 
+		{
+			playing = TRUE;
+			turn = TRUE;
+			diceT = TRUE;
+			m_list.AddString(strTmp);
+			break;
+		}
+		case(89):
+		{
+			playing = TRUE;
+			turn = FALSE;
+			diceT = FALSE;
+			m_list.AddString(strTmp);
+			break;
+		}
+		case(90): // 준비해제
+		{
+			m_list.AddString(chstrg + strTmp);
+			break;
+		}
+		case(100) ://턴 전환
+		{
+			turn = TRUE;
+			diceT = TRUE;
+			m_list.AddString(strTmp);
+			m_list.AddString(_T("윷을 굴려주십시오."));
+			break;
+		}
+		case(45): // 상대 1~4번말 움직이기
+		case(44):
+		case(43):
+		case(42):
+		case(41):
+		case(35):
+		case(34):
+		case(33):
+		case(32):
+		case(31):
+		case(25):
+		case(24):
+		case(23):
+		case(22):
+		case(21):
+		case(15):
+		case(14):
+		case(13):
+		case(12):
+		case(11): 
+		{
+			int vsplay = check / 10;
+			int vsmove = check % 10;
+			cngB(1,player2[vsplay]);
+			for (int k = 0; k < 4; k++) {
+				if (player2[vsplay] == player2[k])
+					player2[k] += vsmove;
+			}
+			m_list.AddString(chstrg + strTmp);
+			checkMv(vsplay);
+			break;
+		}
+		case(46):
+		case(36):
+		case(26):
+		case(16):
+		{
+			int vsplay = check / 10;
+			player2[vsplay] -= 1;
+			m_list.AddString(chstrg + strTmp);
+			checkMv(vsplay);
+			break;
+		}
+		case(6): //상대 도개걸윷모 출력
+		case(5):
+		case(4):
+		case(3):
+		case(2):
+		case(1):
+		{
+			m_list.AddString(chstrg + strTmp);
+			break;
+		}
+		case(99): //상대 승리
+		{
+			m_list.AddString(strTmp);
+			break;
+		}
+
+		}
 	}
+	delete []pTmp;
 	UpdateData(FALSE);
 	return TRUE;
 }
@@ -362,12 +498,8 @@ void CyutnoliDlg::OnBnClickedCancel()
 
 void CyutnoliDlg::SendChat(CString str, int check)
 {
-	/*
-	int bSize = strlen + 4;
-	char* bTmp = new char [bSize];
-	unsigned char* chTmp = new char[strlen];
-	memcpy(st, (unsigned char*)(LPCTSTR)str, i);
-	*/
+	if (check == 100)
+		m_list.AddString(_T("턴을 넘깁니다."));
 	unsigned short int strlen = str.GetLength();
 	m_list.AddString(str);
 	int len_s = (sizeof(char) * strlen * 2) + 1;
@@ -387,7 +519,6 @@ void CyutnoliDlg::SendChat(CString str, int check)
 void CyutnoliDlg::OnClickedButtonSend()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	UpdateData(TRUE);
 	TCHAR pTmp[256];
 	CString strTmp;
@@ -401,11 +532,11 @@ void CyutnoliDlg::OnClickedButtonSend()
 	// 전송
 	SendChat(strTmp, 20);
 
-	// 전송한 데이터도 리스트박스에 보여준다.
+	/* 전송한 데이터도 리스트박스에 보여준다.
 	strTmp.Format(_T("%s"), pTmp);
 	int i = m_list.GetCount();
 	m_list.AddString(strTmp);
-
+	*/
 	UpdateData(FALSE);
 }
 
@@ -416,7 +547,8 @@ void CyutnoliDlg::OnBnClickedThrow()
 	
 	UpdateData(TRUE);
 	CString str;
-	if (1) {
+	if (!moveT && turn && playing && diceT) {
+		roll_m++;
 		int rollv = roll(roll_m);
 		switch (rollv)
 		{
@@ -424,52 +556,440 @@ void CyutnoliDlg::OnBnClickedThrow()
 		{
 			str = "백도가 나왔습니다.";
 			SendChat(str, 6);
+			diceT = FALSE;
+			for (int j = 0; j < 4; j++)
+			{
+				if (player1[j] == 0)
+				{
+					str = "이동 가능한 말이 없습니다.";
+					SendChat(str, 100);
+				}
+			}
 			break;
 		}
 		case 1: {
 			str = "도가 나왔습니다.";
 			SendChat(str, 1);
+			diceT = FALSE;
+			m_list.AddString(_T("이동시킬 말을 골라주십시오."));
 			break;
 		}
 		case 2: {
 			str = "개가 나왔습니다.";
 			SendChat(str, 2);
+			diceT = FALSE;
+			m_list.AddString(_T("이동시킬 말을 골라주십시오."));
 			break;
 		}
 		case 3: {
 			str = "걸이 나왔습니다.";
 			SendChat(str, 3);
+			diceT = FALSE;
+			m_list.AddString(_T("이동시킬 말을 골라주십시오."));
 			break;
 		}
 		case 4: {
 			str = "윷이 나왔습니다.";
 			SendChat(str, 4);
+			m_list.AddString(_T("한번 더 윷을 굴려주십시오."));
 			break;
 		}
 		case 0: {
 			str = "모가 나왔습니다.";
 			SendChat(str, 5);
+			m_list.AddString(_T("한번 더 윷을 굴려주십시오."));
 			break;
 		}
 
 		}
+		
 	}
 	else
 		MessageBox(L"당신의 차례가 아닙니다.");
-	
-	roll_m++;
+	CString mvstr;
 	UpdateData(FALSE);
+	dice_v();
+
+	
+}
+
+CString CyutnoliDlg::dice_v()
+{
+	m_move_list.ResetContent();
+	CString temp = _T("");
+
+	for (int i = 0; i <= roll_m; i++) {
+		if (moveNum[i] == 1)
+		{
+			temp.Append(_T("도 /"));
+		}
+		else if (moveNum[i] == 2)
+		{
+			temp.Append(_T("개 /"));
+		}
+		else if (moveNum[i] == 3)
+		{
+			temp.Append(_T("걸 /"));
+		}
+		else if (moveNum[i] == 4)
+		{
+			temp.Append(_T("윷 /"));
+		}
+		else if (moveNum[i] == 5)
+		{
+			temp.Append(_T("모 /"));
+		}
+		else if (moveNum[i] == -1)
+		{
+			temp.Append(_T("백도 /"));
+		}
+	}
+	m_move_list.AddString(temp);
+	return temp;
+}
+
+void CyutnoliDlg::cngB(int dest, int www) //1= 중립화 2=파랑 3 = 빨강
+{
+	if (1)
+	{
+		h_bmp = (HBITMAP)c_image;
+		switch (www)
+		{
+		case 1: {
+			c_image.Load(L"images\\circle.png"); 
+			break;
+		}
+		case 2: {
+			c_image.Load(L"images\\bluecircle.png");
+			break;
+		}
+		case 3: {
+			c_image.Load(L"images\\redcircle.png");
+			break;
+		}
+
+		}
+		
+		switch (dest) {
+		case 1: {
+			g2.SetBitmap(h_bmp);
+			break;
+		}
+		case 2: {
+			g3.SetBitmap(h_bmp);
+			break;
+		}
+		case 3: {
+			g4.SetBitmap(h_bmp);
+			break;
+		}
+		case 4: {
+			g5.SetBitmap(h_bmp);
+			break;
+		}
+		case 5: {
+			g6.SetBitmap(h_bmp);
+			break;
+		}
+		case 6: {
+			g7.SetBitmap(h_bmp);
+			break;
+		}
+		case 7: {
+			g8.SetBitmap(h_bmp);
+			break;
+		}
+		case 8: {
+			g9.SetBitmap(h_bmp);
+			break;
+		}
+		case 9: {
+			g10.SetBitmap(h_bmp);
+			break;
+		}
+		case 10: {
+			g11.SetBitmap(h_bmp);
+			break;
+		}
+		case 11: {
+			g2.SetBitmap(h_bmp);
+			break;
+		}
+		case 12: {
+			g2.SetBitmap(h_bmp);
+			break;
+		}
+		case 13: {
+			g2.SetBitmap(h_bmp);
+			break;
+		}
+		case 14: {
+			g2.SetBitmap(h_bmp);
+			break;
+		}
+		case 15: {
+			g2.SetBitmap(h_bmp);
+			break;
+		}
+		case 16: {
+			g2.SetBitmap(h_bmp);
+			break;
+		}
+		case 17: {
+			g2.SetBitmap(h_bmp);
+			break;
+		}
+		case 18: {
+			g2.SetBitmap(h_bmp);
+			break;
+		}
+		case 19: {
+			g2.SetBitmap(h_bmp);
+			break;
+		}
+		case 20: {
+			g2.SetBitmap(h_bmp);
+			break;
+		}
+
+		}
+		c_image.Detach();
+
+	}
 }
 
 
+
+void CyutnoliDlg::showMove0(int mvpl, int pos)
+{
+	moveT = TRUE;
+	c_image.Load(L"images\\yellowcircle.png");
+	h_bmp = (HBITMAP)c_image;
+	if (player1[mvpl] == pos)
+	{
+		for (int i = 0; i <= roll_m; i++)
+		{
+			int go = player1[mvpl] + moveNum[i];
+			board[go] = moveNum[i];
+		}
+		if (board[1] != 0)
+			g2.SetBitmap(h_bmp);
+		else if (board[2] != 0)
+			g3.SetBitmap(h_bmp);
+		else if (board[3] != 0)
+			g4.SetBitmap(h_bmp);
+		else if (board[4] != 0)
+			g5.SetBitmap(h_bmp);
+		else if (board[5] != 0)
+			g6.SetBitmap(h_bmp);
+		else if (board[6] != 0)
+			g7.SetBitmap(h_bmp);
+		else if (board[7] != 0)
+			g8.SetBitmap(h_bmp);
+		else if (board[8] != 0)
+			g9.SetBitmap(h_bmp);
+		else if (board[9] != 0)
+			g10.SetBitmap(h_bmp);
+		else if (board[10] != 0)
+			g11.SetBitmap(h_bmp);
+		else if (board[11] != 0)
+			g12.SetBitmap(h_bmp);
+		else if (board[12] != 0)
+			g13.SetBitmap(h_bmp);
+		else if (board[13] != 0)
+			g14.SetBitmap(h_bmp);
+		else if (board[14] != 0)
+			g15.SetBitmap(h_bmp);
+		else if (board[15] != 0)
+			g16.SetBitmap(h_bmp);
+		else if (board[16] != 0)
+			g17.SetBitmap(h_bmp);
+		else if (board[17] != 0)
+			g18.SetBitmap(h_bmp);
+		else if (board[18] != 0)
+			g19.SetBitmap(h_bmp);
+		else if (board[19] != 0)
+			g20.SetBitmap(h_bmp);
+		else if (board[20] != 0)
+			g1.SetBitmap(h_bmp);
+		else if (board[21] != 0)
+			g30.SetBitmap(h_bmp);
+		else
+			m_list.AddString(_T("이동 가능한 위치가 없습니다."));
+	}
+	c_image.Detach();
+}
+void CyutnoliDlg::checkMv(int go) //상대 움직임
+{
+	
+	
+	for (int i = 0; i < 4; i++) //상대가 잡았을때
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			if (player2[i] == player1[j]) {
+				h_bmp = (HBITMAP)c_image;
+				c_image.Load(L"images\\bluecircle.png");
+				player1[j] = 0;
+				m_list.AddString(_T("상대 말이 당신의 말을 잡았습니다. 추가 턴"));
+				switch (j) {
+				case 0: {
+					p11.SetBitmap(h_bmp);
+					break;
+				}
+				case 1: {
+					p12.SetBitmap(h_bmp);
+					break;
+				}
+				case 2: {
+					p13.SetBitmap(h_bmp);
+					break;
+				}
+				case 3: {
+					p14.SetBitmap(h_bmp);
+					break;
+				}
+				}
+			}
+		}
+	}
+	c_image.Detach();
+	for (int i = 0; i < 4; i++) {
+		if (player2[i] > 20) {
+			player2[i] = -1;
+			m_list.AddString(_T("상대의 말이 골인하였습니다."));
+		}
+	}
+	cngB(3, player2[go]);
+	//if(player2[go])
+}
+
+
+void CyutnoliDlg::Moving(int go) //2
+{
+	CString str;
+	int check;
+	for (int i = 0; i <= roll_m; i++)
+	{
+		if (moveNum[i] == board[go])
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				if (player1[j] == player1[i]) {
+					player1[j] += board[go];
+				}
+			}
+			
+			for (int j = i; j < roll_m; j++)
+			{
+				moveNum[j] = moveNum[j + 1];
+			}
+			roll_m--;
+			str = _T("말이 이동하였습니다.");
+			m_list.AddString(str);
+			check = (choPl * 10) + 10 + board[go];
+			SendChat(str, check);
+			for (int j = 0; j < 4; j++)
+			{
+				if (player2[j] == player1[i]) {
+					player2[j] = 0;
+					m_list.AddString(_T("상대 말을 잡았습니다. 추가 턴"));
+					diceT = TRUE;
+					moveT = FALSE;
+				}
+			}
+			break;
+		}
+	}
+	
+	board[go] = 0;
+	moveT = false;
+	choPl = 0;
+	for (int i = 0; i < 4; i++) {
+		if (player1[i] > 20)
+		{
+			player1[i] = -1;
+			int temp = i + 1;
+			str = temp + (_T("번 말이 골인하였습니다."));
+			SendChat(str, 100); 
+			int final = 0;
+			for (int j = 0; j < 4; j++)
+				final += player1[j];
+			if (final == -4)
+			{
+				check = 99;
+				str = _T("승리하였습니다.");
+				m_list.AddString(_T("당신이") + str);
+				SendChat(str, 99);
+			}
+
+		}
+	}
+	if (moveNum == 0)
+	{
+		turn = false;
+		str = _T("턴을 종료합니다.");
+		m_list.AddString(str);
+		SendChat(str, 100);
+	}
+	
+}
 void CyutnoliDlg::OnClickedPlayer11()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	UpdateData(TRUE);
-	m_list.AddString(_T("백도가 나왔습니다."));
+	choPl = 0;
+	if (turn && playing && player1[0] == 0)
+		showMove0(choPl, 0);
+	else
+		MessageBox(L"이동 대상이 아닙니다.");
+	
 	UpdateData(FALSE);
 
 }
+
+
+void CyutnoliDlg::OnClickedPlayer12()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	choPl = 1;
+	if (turn && playing && player1[0] == 0)
+		showMove0(choPl, 0);
+	else
+		MessageBox(L"이동 대상이 아닙니다.");
+
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPlayer13()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	choPl = 2;
+	if (turn && playing && player1[0] == 0)
+		showMove0(choPl, 0);
+	else
+		MessageBox(L"이동 대상이 아닙니다.");
+
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPlayer14()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	choPl = 3;
+	if (turn && playing && player1[0] == 0)
+		showMove0(choPl, 0);
+	else
+		MessageBox(L"이동 대상이 아닙니다.");
+
+	UpdateData(FALSE);
+}
+
 
 
 void CyutnoliDlg::OnClickedReady()
@@ -479,11 +999,13 @@ void CyutnoliDlg::OnClickedReady()
 	if (!ready && !playing) {
 		str = _T("<<<준비 완료>>>");
 		SendChat(str, 91);
+		ready = true;
 	}
 	else if (ready && !playing)
 	{
 		str = _T("<<<준비 해제>>>");
 		SendChat(str, 90);
+		ready = false;
 	}
 	else if (playing)
 	{
@@ -492,3 +1014,412 @@ void CyutnoliDlg::OnClickedReady()
 	
 }
 
+
+
+void CyutnoliDlg::OnClickedP1b()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	
+}
+
+
+void CyutnoliDlg::OnClickedP2b()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CyutnoliDlg::OnClickedP3b()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CyutnoliDlg::OnClickedP4b()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+bool CyutnoliDlg::checkPos(int pos, int mov) //체크
+{
+	for (int i = 0; i < 4; i++) {
+		if (!moveT && turn && playing && (player1[i] == board[pos])) {
+			choPl = i;
+			showMove0(choPl, 1);
+			return false;
+			break;
+		}
+		else if (moveT && turn && playing)
+		{
+			Moving(pos);
+			return true;
+		}
+		else
+			return false;
+	}
+}
+
+void CyutnoliDlg::OnClickedPosition1()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(20, 21))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+void CyutnoliDlg::OnClickedPosition2()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(1, 2)) //t = 움직이기/ f = 말 선택
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+void CyutnoliDlg::OnClickedPosition3()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(2, 3))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition4()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(3, 4))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition5()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(4, 5))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+	
+}
+
+
+void CyutnoliDlg::OnClickedPosition6()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(5, 6))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition7()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(6, 7))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition8()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(7, 8))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition9()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(8, 9))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition10()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(9, 10))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition11()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(10, 11))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition12()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(11, 12))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition13()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(12, 13))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition14()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(13, 14))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition15()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(14, 15))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition16()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(15, 16))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition17()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(16, 17))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition18()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(17,18))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition19()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(18, 19))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition20()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	if (checkPos(19, 20))
+	{
+		c_image.Load(L"images\\bluecircle.png");
+		h_bmp = (HBITMAP)c_image;
+		g1.SetBitmap(h_bmp);
+		c_image.Detach();
+	}
+	UpdateData(FALSE);
+}
+
+
+void CyutnoliDlg::OnClickedPosition21()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	
+}
+
+
+void CyutnoliDlg::OnClickedPosition22()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	
+}
+
+
+void CyutnoliDlg::OnClickedPosition23()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	
+}
+
+
+void CyutnoliDlg::OnClickedPosition24()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	
+}
+
+
+void CyutnoliDlg::OnClickedPosition25()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+}
+
+
+void CyutnoliDlg::OnClickedPosition26()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CyutnoliDlg::OnClickedPosition27()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CyutnoliDlg::OnClickedPosition28()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CyutnoliDlg::OnClickedPosition29()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CyutnoliDlg::OnClickedPosition30()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	//checkPos(21, ); //골인처리
+	UpdateData(FALSE);
+}

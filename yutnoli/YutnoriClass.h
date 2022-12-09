@@ -14,11 +14,14 @@ protected:
 	int player2[4];
 	int board[25]; //보드 (21~25 == 골인)
 	int dice[4]; //윷
-	int* moveNum; //윷 저장
+	int moveNum[32]; //윷 저장
 	int b_len; //보드배열 길이
 	bool playing;
 	bool turn;
 	bool ready;
+	int choPl;
+	bool moveT;
+	bool diceT;
 public:
 	YutnoriClass(); //초기화용
 	int roll(int i); //윷 던지기

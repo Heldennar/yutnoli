@@ -17,34 +17,26 @@ YutnoriClass::YutnoriClass()
 	turn = NULL;
 	ready = NULL;
 	roll_m = 0;
+	for (int i = 0; i < 32; i++) { moveNum[i] = 0; }
+	choPl = -1;
+	moveT = NULL;
+	diceT = NULL;
 }
 int YutnoriClass::roll(int i)
 {
 	int rollv = 0;
 	bool temp = true;
 
-	moveNum = new int[i + 1];
-	
-	if (i > 0) {
-		int* tempNum = new int[i + 1];
-		for (int r = 0; r < i; r++)
-			tempNum[r] = moveNum[r];
-		delete[] moveNum;
-		moveNum = tempNum;
-		delete[] tempNum;
-		tempNum = NULL;
-	}
 	for (int j = 0; j < 4; j++) {
-		// 시드값을 얻기 위한 random_device 생성.
 		std::random_device rd;
-
-		// random_device 를 통해 난수 생성 엔진을 초기화 한다.
 		std::mt19937 gen(rd());
-
-		// 0 부터 99 까지 균등하게 나타나는 난수열을 생성하기 위해 균등 분포 정의.
 		std::uniform_int_distribution<int> dis(0, 1);
 		dice[j] = dis(gen);
 		rollv += dice[j];
+	}
+	if (rollv == 1 && dice[0] == 1)
+	{
+		rollv = -1;
 	}
 	moveNum[i] = rollv;
 	return rollv;
@@ -163,3 +155,4 @@ void YutnoriClass::showPlayer()
 	}
 	printf(")\n");
 }
+
