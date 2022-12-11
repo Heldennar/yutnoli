@@ -21,8 +21,9 @@ YutnoriClass::YutnoriClass()
 	choPl = -1;
 	moveT = NULL;
 	diceT = NULL;
+	choVa = 0;
 }
-int YutnoriClass::roll(int i)
+int YutnoriClass::roll()
 {
 	int rollv = 0;
 	bool temp = true;
@@ -38,7 +39,11 @@ int YutnoriClass::roll(int i)
 	{
 		rollv = -1;
 	}
-	moveNum[i] = rollv;
+	if (rollv == 0)
+	{
+		rollv = 5;
+	}
+	moveNum[roll_m] = rollv;
 	return rollv;
 }
 void YutnoriClass::move(int player)

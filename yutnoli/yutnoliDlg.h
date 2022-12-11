@@ -22,10 +22,19 @@ public:
 
 	CImage c_image;
 	HBITMAP h_bmp;
+	CImage c_image2;
+	HBITMAP h_bmp2;
+	CImage c_imageS;
+	HBITMAP h_bmpS;
+	CImage c_image1;
+	HBITMAP h_bmp1;
+	CImage c_imageY;
+	HBITMAP h_bmpY;
 
 // 구현입니다.
 protected:
 	HICON m_hIcon;
+	bool inpath;
 
 	// 생성된 메시지 맵 함수
 	virtual BOOL OnInitDialog();
@@ -35,11 +44,16 @@ protected:
 	afx_msg LRESULT OnReceive(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 public:
+	int checkPath(int pos, int pl);
+	void TOver();
 	void cngB(int dest, int www);
 	CString CH2CS(char* strInput);
 	char* CS2CHAR(CString strInput);
 	void SendChat(CString str, int check);
 	void checkMv(int go);
+	bool IsDead(); 
+	void Refresh();
+	bool InPath();
 	CStatic g1;
 	CStatic g2;
 	CStatic g3;
