@@ -307,7 +307,7 @@ LPARAM CyutnoliDlg::OnReceive(WPARAM wParam, LPARAM lParam) {
 	UpdateData(TRUE);
 	CString strTmp;
 
-	unsigned char check, msg_id;//message_id
+	unsigned char check;//message_id
 	unsigned short int body_size;
 
 	m_socCom.Receive((char*)&check, 1, 0);    // wParam = 클라이언트 번호/헤더 1바이트 읽기
@@ -368,7 +368,7 @@ LPARAM CyutnoliDlg::OnReceive(WPARAM wParam, LPARAM lParam) {
 			turn = TRUE;
 			diceT = TRUE;
 			m_list.AddString(strTmp);
-			m_list.AddString(_T("윷을 굴려주십시오."));
+			m_list.AddString(_T("당신의 턴입니다. 윷을 굴려주십시오."));
 			break;
 		}
 		case(45): // 상대 1~4번말 움직이기
@@ -392,12 +392,15 @@ LPARAM CyutnoliDlg::OnReceive(WPARAM wParam, LPARAM lParam) {
 		case(12):
 		case(11): 
 		{
-			int vsplay = check / 10;
+			int vsplay = (check / 10) -1;
 			int vsmove = check % 10;
+			int temp = player2[vsplay];
 			for (int k = 0; k < 4; k++) {
-				if (player2[vsplay] == player2[k])
+				if ((player2[vsplay] == player2[k]) && player2[k] !=0)
 					player2[k] += vsmove;
 			}
+			if (player2[vsplay] == 0)
+				player2[vsplay] = vsmove;
 			m_list.AddString(chstrg + strTmp);
 			checkMv(vsplay);
 			break;
@@ -426,6 +429,8 @@ LPARAM CyutnoliDlg::OnReceive(WPARAM wParam, LPARAM lParam) {
 		case(99): //상대 승리
 		{
 			m_list.AddString(strTmp);
+			MessageBox(L"상대의 승리입니다. 게임을 종료합니다.");
+			m_socCom.Detach();
 			break;
 		}
 
@@ -453,7 +458,6 @@ CString CyutnoliDlg:: CH2CS(char* strInput)
 {
 
 	// ## char* -> wchar_t -> CString ##
-
 	wchar_t* strWCHAR;
 	CString strOutput;
 	int iLength;
@@ -710,11 +714,15 @@ void CyutnoliDlg::cngB(int dest, int www) //1= 중립화 2=파랑 3 = 빨강 + 2
 			g4.SetBitmap(h_bmp);
 			break;
 		}
+		case 29:
 		case 4: {
 			g5.SetBitmap(h_bmp);
 			break;
 		}
-		case 30:
+		case 30: {
+			g6.SetBitmap(h_bmp);
+			break;
+		}
 		case 5: {
 			g6.SetBitmap(h_bmp);
 			break;
@@ -735,7 +743,10 @@ void CyutnoliDlg::cngB(int dest, int www) //1= 중립화 2=파랑 3 = 빨강 + 2
 			g10.SetBitmap(h_bmp);
 			break;
 		}
-		case 50:
+		case 50: {
+			g11.SetBitmap(h_bmp);
+			break;
+		}
 		case 10: {
 			g11.SetBitmap(h_bmp);
 			break;
@@ -752,36 +763,57 @@ void CyutnoliDlg::cngB(int dest, int www) //1= 중립화 2=파랑 3 = 빨강 + 2
 			g14.SetBitmap(h_bmp);
 			break;
 		}
+		case 49:
 		case 14: {
 			g15.SetBitmap(h_bmp);
 			break;
 		}
-		case 36:
+		case 36: {
+			g16.SetBitmap(h_bmp);
+			break;
+		}
 		case 15: {
 			g16.SetBitmap(h_bmp);
 			break;
 		}
 		case 37:
+		{
+			g17.SetBitmap(h_bmp);
+			break;
+		}
 		case 16: {
 			g17.SetBitmap(h_bmp);
 			break;
 		}
-		case 38:
+		case 38: {
+			g18.SetBitmap(h_bmp);
+			break;
+		}
 		case 17: {
 			g18.SetBitmap(h_bmp);
 			break;
 		}
-		case 39:
+		case 39: {
+			g19.SetBitmap(h_bmp);
+			break;
+		}
 		case 18: {
 			g19.SetBitmap(h_bmp);
 			break;
 		}
 		case 40:
+		{
+			g20.SetBitmap(h_bmp);
+			break;
+		}
 		case 19: {
 			g20.SetBitmap(h_bmp);
 			break;
 		}
-		case 56:
+		case 56: {
+			g1.SetBitmap(h_bmp);
+			break;
+		}
 		case 20: {
 			g1.SetBitmap(h_bmp);
 			break;
@@ -794,28 +826,38 @@ void CyutnoliDlg::cngB(int dest, int www) //1= 중립화 2=파랑 3 = 빨강 + 2
 		case 32: {
 			g22.SetBitmap(h_bmp);
 			break; }
-		case 33:
+		case 33: {
+			g23.SetBitmap(h_bmp);
+			break; 
+		}
 		case 53: {
 			g23.SetBitmap(h_bmp);
-			break; }
+			break; 
+		}
 		case 34: {
 			g24.SetBitmap(h_bmp);
-			break; }
+			break; 
+		}
 		case 35: {
 			g25.SetBitmap(h_bmp);
-			break; }
+			break;
+		}
 		case 51: {
 			g26.SetBitmap(h_bmp);
-			break; }
+			break; 
+		}
 		case 52: {
 			g27.SetBitmap(h_bmp);
-			break; }
+			break; 
+		}
 		case 54: {
 			g28.SetBitmap(h_bmp);
-			break; }
+			break; 
+		}
 		case 55: {
 			g29.SetBitmap(h_bmp);
-			break; }
+			break; 
+		}
 
 		}
 		c_image.Detach();
@@ -845,7 +887,7 @@ void CyutnoliDlg::showMove0(int mvpl, int pos) //말, 위치
 			g3.SetBitmap(h_bmp);
 		if (board[3] != 0)
 			g4.SetBitmap(h_bmp);
-		if (board[4] != 0)
+		if (board[4] != 0 || board[29] != 0)
 			g5.SetBitmap(h_bmp);
 		if ((board[5] != 0 )||(board[30] !=0))
 			g6.SetBitmap(h_bmp);
@@ -865,7 +907,7 @@ void CyutnoliDlg::showMove0(int mvpl, int pos) //말, 위치
 			g13.SetBitmap(h_bmp);
 		if (board[13] != 0)
 			g14.SetBitmap(h_bmp);
-		if (board[14] != 0)
+		if (board[14] != 0 || board[49] != 0)
 			g15.SetBitmap(h_bmp);
 		if ((board[15] != 0)||(board[36] != 0))
 			g16.SetBitmap(h_bmp);
@@ -911,48 +953,26 @@ void CyutnoliDlg::checkMv(int go) //상대 움직임
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			if (player2[i] == player1[j] && player1[j] != 0 && player2[i] != 0) {
-				c_image.Load(L"images\\bluecircle.png");
-				h_bmp = (HBITMAP)c_image;
+			if ((player2[i] == player1[j]) && player2[i] != 0) {
 				player1[j] = 0;
-				m_list.AddString(_T("상대 말이 당신의 말을 잡았습니다. 추가 턴"));
-				switch (j) {
-				case 0: {
-					p11.SetBitmap(h_bmp);
-					break;
-				}
-				case 1: {
-					p12.SetBitmap(h_bmp);
-					break;
-				}
-				case 2: {
-					p13.SetBitmap(h_bmp);
-					break;
-				}
-				case 3: {
-					p14.SetBitmap(h_bmp);
-					break;
-				}
-				}
-				c_image.Detach();
+				m_list.AddString(_T("상대가 당신의 말을 잡았습니다."));
 			}
 		}
 	}
 	
 	for (int i = 0; i < 4; i++) {
-		if (player2[i] > 20) {
+		if ((player2[i] > 20 && player2[i] < 28)|| (player2[i] > 56 && player2[i] < 63)){
 			player2[i] = -1;
 			m_list.AddString(_T("상대의 말이 골인하였습니다."));
 		}
 	}
 	IsDead();
 	Refresh();
-	//cngB(3, player2[go]);
-	//if(player2[go])
 }
 
 void CyutnoliDlg::Refresh()
 {
+	InPath();
 	for (int i = 0; i < b_len; i++)
 	{
 		board[i] = 0;
@@ -1153,6 +1173,11 @@ bool CyutnoliDlg::InPath() {
 			player1[i] = 53;
 		if (player1[i] == 56)
 			player1[i] = 20;
+		if (player1[i] == 29)
+			player1[i] = 4;
+		if (player1[i] == 49)
+			player1[i] = 14;
+
 
 		if (player2[i] == 5)
 			player2[i] = 30;
@@ -1172,7 +1197,7 @@ bool CyutnoliDlg::InPath() {
 			player2[i] = 53;
 		if (player2[i] == 56)
 			player2[i] = 20;
-		if (player1[i] > 29)
+		if (player1[i] > 28)
 			inpath = true;
 	}
 	if ((player1[0] < 29) && (player1[1] < 29) && (player1[2] < 29) && (player1[3] < 29))
@@ -1231,11 +1256,12 @@ void CyutnoliDlg::Moving(int go) //2
 	
 
 	for (int i = 0; i < 4; i++) {
-		if ((player1[i] > 20 && player1[i] < 26) || (player1[i] > 57 && player1[i] <62))
+		if ((player1[i] > 20 && player1[i] < 26) || (player1[i] > 56 && player1[i] <63))
 		{
 			player1[i] = -1;
 			int num = i + 1;
 			str = num + (_T("번 말이 골인하였습니다."));
+			m_list.AddString(str);
 			int final = 0;
 			for (int j = 0; j < 4; j++)
 				final += player1[j];
@@ -1389,13 +1415,18 @@ void CyutnoliDlg::OnClickedP2b()
 void CyutnoliDlg::OnClickedP3b()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	
+	Refresh();
 }
 
 
 void CyutnoliDlg::OnClickedP4b()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString str2;
+	for (int i = 0; i < 4; i++) {
+		str2.Format(_T("%d의 위치는 %d입니다."), i, player2[i]);
+		m_list.AddString(str2);
+	}
 }
 
 int CyutnoliDlg::checkPath(int pos, int pl)
@@ -1412,8 +1443,28 @@ int CyutnoliDlg::checkPath(int pos, int pl)
 		pos = 56;
 	if (pos == 21 && player1[pl] > 50)
 		pos = 57;
-	if (pos == 21 && player1[pl] < 29 && player1[pl] > 0)
+	if (pos == 21 && player1[pl] == 21)
 		pos = 21;
+	if (pos == 21 && player1[pl] == 22)
+		pos = 22;
+	if (pos == 21 && player1[pl] == 23)
+		pos = 23;
+	if (pos == 21 && player1[pl] == 24)
+		pos = 24;
+	if (pos == 21 && player1[pl] == 25)
+		pos = 25;
+	if (pos == 15 && player1[pl] > 30)
+		pos = 36;
+	if (pos == 16 && player1[pl] > 30)
+		pos = 37;
+	if (pos == 17 && player1[pl] > 30)
+		pos = 38;
+	if (pos == 18 && player1[pl] > 30)
+		pos = 39;
+	if (pos == 19 && player1[pl] > 30)
+		pos = 40;
+	if (pos == 33 && player1[pl] > 49)
+		pos = 53;
 	return pos;
 }
 
@@ -1454,7 +1505,7 @@ void CyutnoliDlg::OnClickedPosition1()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	UpdateData(TRUE);
-	checkPos(0, 1);
+	checkPos(20, 1);
 	UpdateData(FALSE);
 }
 
