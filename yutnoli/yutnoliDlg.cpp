@@ -365,8 +365,10 @@ LPARAM CyutnoliDlg::OnReceive(WPARAM wParam, LPARAM lParam) {
 		}
 		case(100) ://턴 전환
 		{
-			turn = TRUE;
-			diceT = TRUE;
+			turn = true;
+			diceT = true;
+			roll_m = 0;
+			moveT = false;
 			m_list.AddString(strTmp);
 			m_list.AddString(_T("당신의 턴입니다. 윷을 굴려주십시오."));
 			break;
@@ -396,11 +398,11 @@ LPARAM CyutnoliDlg::OnReceive(WPARAM wParam, LPARAM lParam) {
 			int vsmove = check % 10;
 			int temp = player2[vsplay];
 			for (int k = 0; k < 4; k++) {
-				if ((player2[vsplay] == player2[k]) && player2[k] !=0)
+				if ((temp == player2[k]) && temp !=0)
 					player2[k] += vsmove;
 			}
 			if (player2[vsplay] == 0)
-				player2[vsplay] = vsmove;
+				player2[vsplay] += vsmove;
 			m_list.AddString(chstrg + strTmp);
 			checkMv(vsplay);
 			break;
@@ -410,8 +412,14 @@ LPARAM CyutnoliDlg::OnReceive(WPARAM wParam, LPARAM lParam) {
 		case(26):
 		case(16):
 		{
-			int vsplay = check / 10;
-			player2[vsplay] -= 1;
+			int vsplay = (check / 10) - 1;
+			int temp = player2[vsplay];
+			for (int k = 0; k < 4; k++) {
+				if ((temp == player2[k]) && temp != 0)
+					player2[k] -= 1;
+			}
+			if(temp == player2[vsplay])
+				player2[vsplay] -= 1;
 			m_list.AddString(chstrg + strTmp);
 			checkMv(vsplay);
 			break;
@@ -514,7 +522,7 @@ void CyutnoliDlg::SendChat(CString str, int check)
 	memcpy(buff + 2, pTmp, len_s);
 	m_socCom.Send(buff,len_s+2);
 
-	
+	m_list.SetTopIndex(m_list.GetCount() - 1);
 	delete[] buff;
 	delete[] pTmp;
 }
@@ -571,21 +579,21 @@ void CyutnoliDlg::OnBnClickedThrow()
 		case 1: {
 			str = "도가 나왔습니다.";
 			SendChat(str, 1);
-			diceT = FALSE;
+			diceT = false;
 			m_list.AddString(_T("이동시킬 말을 골라주십시오."));
 			break;
 		}
 		case 2: {
 			str = "개가 나왔습니다.";
 			SendChat(str, 2);
-			diceT = FALSE;
+			diceT = false;
 			m_list.AddString(_T("이동시킬 말을 골라주십시오."));
 			break;
 		}
 		case 3: {
 			str = "걸이 나왔습니다.";
 			SendChat(str, 3);
-			diceT = FALSE;
+			diceT = false;
 			m_list.AddString(_T("이동시킬 말을 골라주십시오."));
 			break;
 		}
@@ -609,7 +617,8 @@ void CyutnoliDlg::OnBnClickedThrow()
 	}
 	else
 		MessageBox(L"당신의 차례가 아닙니다.");
-	CString mvstr;
+	
+	m_list.SetTopIndex(m_list.GetCount() - 1);
 	UpdateData(FALSE);
 	dice_v();
 
@@ -948,24 +957,19 @@ void CyutnoliDlg::showMove0(int mvpl, int pos) //말, 위치
 }
 void CyutnoliDlg::checkMv(int go) //상대 움직임
 {
-	
-	for (int i = 0; i < 4; i++) //상대가 잡았을때
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			if ((player2[i] == player1[j]) && player2[i] != 0) {
-				player1[j] = 0;
-				m_list.AddString(_T("상대가 당신의 말을 잡았습니다."));
-			}
-		}
-	}
-	
 	for (int i = 0; i < 4; i++) {
-		if ((player2[i] > 20 && player2[i] < 28)|| (player2[i] > 56 && player2[i] < 63)){
+		if (player2[go] == player1[i]) {
+			player1[i] = 0;
+			m_list.AddString(_T("상대가 당신의 말을 잡았습니다."));
+		}
+		if (((player2[i] > 20) && (player2[i] < 26)) || (player2[i] > 56))
+		{
 			player2[i] = -1;
-			m_list.AddString(_T("상대의 말이 골인하였습니다."));
+			m_list.AddString(_T("상대말이 골인하였습니다."));
 		}
 	}
+
+	m_list.SetTopIndex(m_list.GetCount() - 1);
 	IsDead();
 	Refresh();
 }
@@ -1197,13 +1201,14 @@ bool CyutnoliDlg::InPath() {
 			player2[i] = 53;
 		if (player2[i] == 56)
 			player2[i] = 20;
-		if (player1[i] > 28)
-			inpath = true;
+		if (player2[i] == 29)
+			player2[i] = 4;
+		if (player2[i] == 49)
+			player2[i] = 14;
 	}
-	if ((player1[0] < 29) && (player1[1] < 29) && (player1[2] < 29) && (player1[3] < 29))
-		inpath = false;
+	
 
-	return inpath;
+	return true;
 }
 
 void CyutnoliDlg::Moving(int go) //2
@@ -1211,32 +1216,31 @@ void CyutnoliDlg::Moving(int go) //2
 	CString str;
 	int check;
 	int temp = player1[choPl];
-	//cngB(temp, 1);
 	for (int i = 0; i < roll_m; i++)
 	{
-		if (moveNum[i] == board[go])
+		if (moveNum[i] == board[go]) //이동하려는 수와 이동하려는 목표의 값이 같다면
 		{
-			for (int j = 0; j < 4; j++)
+			for (int j = 0; j < 4; j++) //업힌 말이 있다면
 			{
 				if (player1[j] == temp && player1[choPl] != 0) {
 					player1[j] += board[go];
 				}
 			}
-			if (player1[choPl] == 0)
+			if (player1[choPl] == 0) 
 				player1[choPl] += board[go];
-			for (int j = i; j < roll_m; j++)
+
+			for (int j = i; j < roll_m; j++) //이동 성공시 moveNum 당기기
 			{
 				moveNum[j] = moveNum[j + 1];
 			}
-			roll_m--;
+			if(roll_m > 0) //윷을 굴린 수가 1번 이상이라면 0수렴
+				roll_m--;
 			str = _T("말이 이동하였습니다.");
 			check = (choPl * 10) + 10 + board[go];
 			SendChat(str, check);
 			InPath();
 
 			temp = player1[choPl];
-			//cngB(temp, 2);
-			board[go] = 0;
 			moveT = false;
 			choPl = -1;
 			for (int j = 0; j < 4; j++)
@@ -1244,8 +1248,8 @@ void CyutnoliDlg::Moving(int go) //2
 				if ((player2[j] == temp)&& player2[j] !=0) {
 					player2[j] = 0;
 					m_list.AddString(_T("상대 말을 잡았습니다. 추가 턴"));
-					diceT = TRUE;
-					moveT = FALSE;
+					diceT = true;
+					moveT = false;
 				}
 			}
 			dice_v();
@@ -1271,16 +1275,17 @@ void CyutnoliDlg::Moving(int go) //2
 				str = _T("승리하였습니다.");
 				m_list.AddString(_T("당신이") + str);
 				SendChat(str, 99);
-			}
 
+			}
+			m_list.SetTopIndex(m_list.GetCount() - 1);
 		}
 	}
 	int num2 = 0;
-	for (int i = 0; i < 32; i++)
+	for (int i = 0; i < roll_m; i++)
 	{
 		num2 += moveNum[i];
 	}
-	if (num2 == 0)
+	if (num2 == 0 && !diceT)
 	{
 		TOver();
 	}
@@ -1299,7 +1304,6 @@ void CyutnoliDlg::TOver()
 	dice_v();
 	str = _T("턴을 종료합니다.");
 	SendChat(str, 100);
-	IsDead();
 }
 void CyutnoliDlg::OnClickedPlayer11()
 {
@@ -1442,17 +1446,14 @@ int CyutnoliDlg::checkPath(int pos, int pl)
 	if (pos == 20 && player1[pl] > 50)
 		pos = 56;
 	if (pos == 21 && player1[pl] > 50)
-		pos = 57;
-	if (pos == 21 && player1[pl] == 21)
-		pos = 21;
-	if (pos == 21 && player1[pl] == 22)
-		pos = 22;
-	if (pos == 21 && player1[pl] == 23)
-		pos = 23;
-	if (pos == 21 && player1[pl] == 24)
-		pos = 24;
-	if (pos == 21 && player1[pl] == 25)
-		pos = 25;
+	{
+		for (int k = 57; k < 62; k++) {
+			if (board[k] != 0) {
+				pos = k;
+				break;
+			}
+		}
+	}
 	if (pos == 15 && player1[pl] > 30)
 		pos = 36;
 	if (pos == 16 && player1[pl] > 30)
@@ -1465,6 +1466,10 @@ int CyutnoliDlg::checkPath(int pos, int pl)
 		pos = 40;
 	if (pos == 33 && player1[pl] > 49)
 		pos = 53;
+	if (pos == 4 && player1[pl] == 30)
+		pos = 29;
+	if (pos == 9 && player1[pl] == 50)
+		pos = 49;
 	return pos;
 }
 
@@ -1475,7 +1480,7 @@ bool CyutnoliDlg::checkPos(int pos, int mov) //체크
 	for (int i = 0; i < 4; i++) {
 		
 		pos = checkPath(pos, i);
-		if (moveNum[0] != 0 && !moveT && turn && playing && player1[i] == pos)//움직일 말 선택
+		if (moveNum[0] != 0 && !moveT && turn && playing && !diceT && player1[i] == pos)//움직일 말 선택
 		{
 			choPl = i;
 			choVa = player1[choPl];
@@ -1483,7 +1488,7 @@ bool CyutnoliDlg::checkPos(int pos, int mov) //체크
 			return true;
 			break;
 		}
-		else if (moveNum[0] != 0 && moveT && turn && playing ) //움직이기
+		else if (moveNum[0] != 0 && moveT && turn && playing && !diceT) //움직이기
 		{
 			Moving(pos);
 			return true;
@@ -1494,6 +1499,8 @@ bool CyutnoliDlg::checkPos(int pos, int mov) //체크
 			m_list.AddString(_T("moveT에 문제가 있음"));
 			
 		}
+		else if(diceT)
+			m_list.AddString(_T("윷을 굴려주십시오"));
 		else
 			m_list.AddString(_T("조건식에 문제가 있음"));
 	}
