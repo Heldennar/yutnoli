@@ -10,6 +10,7 @@
 #include <atlimage.h>
 #include <afxsock.h>
 #include "YutnoriClass.h"
+#include <random>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -53,7 +54,7 @@ CyutnoliDlg::CyutnoliDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_YUTNOLI_DIALOG, pParent)
 	, m_strIP(_T("127.0.0.1"))
 	, m_strSend(_T(""))
-	, m_strUserID(_T("대기 중"))
+	, m_strUserID(_T("대기중"))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -322,7 +323,6 @@ LPARAM CyutnoliDlg::OnReceive(WPARAM wParam, LPARAM lParam) {
 	if (strTmp.Find(_T(SOC_CLIENT_CONNECT)) == 0) {
 		// Right 함수를 이용해 가장 오른쪽에 있는 번호 추출. 0은 \0이다.
 		m_strUserID = _T("사용자 : ") + strTmp.Right(1);
-		m_useID.SetWindowTextW(_T("접속중"));
 	}
 	else {
 		switch (check)
@@ -348,6 +348,7 @@ LPARAM CyutnoliDlg::OnReceive(WPARAM wParam, LPARAM lParam) {
 			turn = TRUE;
 			diceT = TRUE;
 			m_list.AddString(strTmp);
+			m_useID.SetWindowTextW(_T("당신 차례"));
 			break;
 		}
 		case(89):
@@ -356,6 +357,7 @@ LPARAM CyutnoliDlg::OnReceive(WPARAM wParam, LPARAM lParam) {
 			turn = FALSE;
 			diceT = FALSE;
 			m_list.AddString(strTmp);
+			m_useID.SetWindowTextW(_T("상대 차례"));
 			break;
 		}
 		case(90): // 준비해제
@@ -369,8 +371,9 @@ LPARAM CyutnoliDlg::OnReceive(WPARAM wParam, LPARAM lParam) {
 			diceT = true;
 			roll_m = 0;
 			moveT = false;
-			m_list.AddString(strTmp);
+			//m_list.AddString(strTmp);
 			m_list.AddString(_T("당신의 턴입니다. 윷을 굴려주십시오."));
+			m_useID.SetWindowTextW(_T("당신 차례"));
 			break;
 		}
 		case(45): // 상대 1~4번말 움직이기
@@ -510,7 +513,8 @@ void CyutnoliDlg::OnBnClickedCancel()
 
 void CyutnoliDlg::SendChat(CString str, int check)
 {
-	
+	if(check == 100)
+		m_useID.SetWindowTextW(_T("상대 차례"));
 	unsigned short int strlen = str.GetLength();
 	m_list.AddString(str);
 	int len_s = (sizeof(char) * strlen * 2) + 1;
@@ -546,6 +550,78 @@ void CyutnoliDlg::OnClickedButtonSend()
 	UpdateData(FALSE);
 }
 
+int CyutnoliDlg::roll()
+{
+	int rollv = 0;
+	bool temp = true;
+
+	for (int j = 0; j < 4; j++) {
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<int> dis(0, 1);
+		dice[j] = dis(gen);
+		rollv += dice[j];
+	}
+	if (dice[0] == 1) {
+		c_imageY.Load(L"images\\stickb.png");
+		h_bmpY = (HBITMAP)c_imageY;
+		st1.SetBitmap(h_bmpY);
+		c_imageY.Detach();
+	}
+	else if (dice[0] == 0) {
+		c_imageY.Load(L"images\\stickx.png");
+		h_bmpY = (HBITMAP)c_imageY;
+		st1.SetBitmap(h_bmpY);
+		c_imageY.Detach();
+	}
+	if (dice[1] == 1) {
+		c_imageY.Load(L"images\\stick.png");
+		h_bmpY = (HBITMAP)c_imageY;
+		st2.SetBitmap(h_bmpY);
+		c_imageY.Detach();
+	}
+	else if (dice[1] == 0) {
+		c_imageY.Load(L"images\\stickx.png");
+		h_bmpY = (HBITMAP)c_imageY;
+		st2.SetBitmap(h_bmpY);
+		c_imageY.Detach();
+	}
+	if (dice[2] == 1) {
+		c_imageY.Load(L"images\\stick.png");
+		h_bmpY = (HBITMAP)c_imageY;
+		st3.SetBitmap(h_bmpY);
+		c_imageY.Detach();
+	}
+	else if (dice[2] == 0) {
+		c_imageY.Load(L"images\\stickx.png");
+		h_bmpY = (HBITMAP)c_imageY;
+		st3.SetBitmap(h_bmpY);
+		c_imageY.Detach();
+	}
+	if (dice[3] == 1) {
+		c_imageY.Load(L"images\\stick.png");
+		h_bmpY = (HBITMAP)c_imageY;
+		st4.SetBitmap(h_bmpY);
+		c_imageY.Detach();
+	}
+	else if (dice[3] == 0) {
+		c_imageY.Load(L"images\\stickx.png");
+		h_bmpY = (HBITMAP)c_imageY;
+		st4.SetBitmap(h_bmpY);
+		c_imageY.Detach();
+	}
+
+	if (rollv == 1 && dice[0] == 1)
+	{
+		rollv = -1;
+	}
+	if (rollv == 0)
+	{
+		rollv = 5;
+	}
+	moveNum[roll_m] = rollv;
+	return rollv;
+}
 
 void CyutnoliDlg::OnBnClickedThrow()
 {
@@ -615,8 +691,10 @@ void CyutnoliDlg::OnBnClickedThrow()
 		}
 		roll_m++;
 	}
-	else
+	else if(!turn)
 		MessageBox(L"당신의 차례가 아닙니다.");
+	else if(!diceT || !moveT)
+		MessageBox(L"윷을 굴리는 차례가 아닙니다.");
 	
 	m_list.SetTopIndex(m_list.GetCount() - 1);
 	UpdateData(FALSE);
@@ -826,6 +904,10 @@ void CyutnoliDlg::cngB(int dest, int www) //1= 중립화 2=파랑 3 = 빨강 + 2
 		case 20: {
 			g1.SetBitmap(h_bmp);
 			break;
+		}
+		case 21:
+		{
+			g30.SetBitmap(h_bmpS);
 		}
 		case 31:
 		{
@@ -1275,7 +1357,8 @@ void CyutnoliDlg::Moving(int go) //2
 				str = _T("승리하였습니다.");
 				m_list.AddString(_T("당신이") + str);
 				SendChat(str, 99);
-
+				MessageBox(L"당신의 승리입니다. 게임을 종료합니다.");
+				m_socCom.Detach();
 			}
 			m_list.SetTopIndex(m_list.GetCount() - 1);
 		}
@@ -1439,7 +1522,11 @@ int CyutnoliDlg::checkPath(int pos, int pl)
 		pos = 20;
 	if (pos == 5 && player1[pl] == 30)
 		pos = 30;
+	if (pos == 5 && player1[pl] == 31)
+		pos = 30;
 	if (pos == 10 && player1[pl] == 50)
+		pos = 50;
+	if (pos == 10 && player1[pl] == 51)
 		pos = 50;
 	if (pos == 23 && player1[pl] == 53)
 		pos = 53;
@@ -1502,7 +1589,7 @@ bool CyutnoliDlg::checkPos(int pos, int mov) //체크
 		else if(diceT)
 			m_list.AddString(_T("윷을 굴려주십시오"));
 		else
-			m_list.AddString(_T("조건식에 문제가 있음"));
+			m_list.AddString(_T("움직일 수 없습니다"));
 	}
 
 	return false;

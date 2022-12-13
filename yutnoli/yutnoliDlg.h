@@ -44,6 +44,7 @@ protected:
 	afx_msg LRESULT OnReceive(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 public:
+	int roll();
 	int checkPath(int pos, int pl);
 	void TOver();
 	void cngB(int dest, int www);

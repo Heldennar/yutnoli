@@ -25,12 +25,4 @@ protected:
 	int choVa;
 public:
 	YutnoriClass(); //초기화용
-	int roll(); //윷 던지기
-	void move(int player); //이동
-	bool randT(); //시작 순서
-	bool bonusT(); //추가턴 확인
-	bool catchs(int num); //말 잡기or 업기
-	bool goal(); //골인 확인
-	bool win(); //승리 확인
-	void showPlayer();
 };
